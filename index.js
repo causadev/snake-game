@@ -26,7 +26,6 @@ function drawApple() {
 drawApple()
 drawSnake()
 
-window.addEventListener("keydown", snakeDirection)
 
 
 function snakeDirection(e) {
@@ -100,3 +99,4 @@ function gameloop() {
 }
 
 setInterval(gameloop, speed)
+window.addEventListener("keydown", snakeDirection)
