@@ -4,18 +4,25 @@ const scoreText = document.querySelector("#scoreText")
 const resetBtn = document.querySelector("#resetBtn")
 const snakeSize = 25
 let currentDirection;
-let snakeX = 0;
-let snakeY = 0;
-const appleX = 200; 
-const appleY = 200; 
-let speed = 500;
+let snakeX = 200;
+let snakeY = 200;
+let appleX = randomNumber(); 
+let appleY = randomNumber(); 
+let speed = 100;
+let score = 0
+const snakeBody = []
 ctx.fillStyle = "#003049";
 ctx.fillRect(0, 0, canvas.width, canvas.height);
 
 function drawSnake() {
   ctx.fillStyle = "#fff";
   ctx.fillRect(snakeX, snakeY, snakeSize, snakeSize);
+  snakeBody.forEach((segment) => {
+    ctx.fillRect(segment.x, segment.y, snakeSize, snakeSize);
+  })
 }
+
+
 
 function drawApple() {
   ctx.fillStyle = "#FF0000";
@@ -61,6 +68,8 @@ function moveSnake() {
   if (checkCollision()) {
     return;
   }
+  snakeBody.unshift({x: snakeX, y: snakeY})
+  console.log(snakeBody)
   switch (currentDirection) {
     case "RIGHT":
       snakeX += snakeSize
@@ -77,7 +86,9 @@ function moveSnake() {
     case "DOWN":
       snakeY += snakeSize
   }
-
+  if (snakeBody.length > 0) {
+    snakeBody.pop()
+  }
 }
 
 
@@ -90,9 +101,30 @@ function checkCollision() {
 
 }
 
+function randomNumber() {
+  return Math.floor(Math.random() * (canvas.width / snakeSize)) * snakeSize;
+}
+
+function eatApple() {
+  if (snakeX === appleX && snakeY === appleY) {
+    appleX = randomNumber()
+    appleY = randomNumber()
+    scoreText.textContent = score++
+    console.log("apple")
+    growSnake()
+  }
+}
+
+
+function growSnake() {
+  snakeBody.push({})
+}
+ 
+
 function gameloop() {
   ctx.fillStyle = "#003049";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
+  eatApple()
   moveSnake()
   drawApple()
   drawSnake()
