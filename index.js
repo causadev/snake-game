@@ -2,14 +2,17 @@ const canvas = document.getElementById("gameBoard");
 const ctx = canvas.getContext("2d");
 const scoreText = document.querySelector("#scoreText")
 const resetBtn = document.querySelector("#resetBtn")
+const overlay = document.getElementById('overlay')
+const modal = document.querySelector("#modal")
 const snakeSize = 25
 let currentDirection;
 let snakeX = 200;
 let snakeY = 200;
-let appleX = randomNumber(); 
-let appleY = randomNumber(); 
-let speed = 100;
+let appleX = randomNumber();
+let appleY = randomNumber();
+let speed = 135;
 let score = 0
+let gameIsRunning = true
 const snakeBody = []
 ctx.fillStyle = "#003049";
 ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -68,8 +71,7 @@ function moveSnake() {
   if (checkCollision()) {
     return;
   }
-  snakeBody.unshift({x: snakeX, y: snakeY})
-  console.log(snakeBody)
+  snakeBody.unshift({ x: snakeX, y: snakeY })
   switch (currentDirection) {
     case "RIGHT":
       snakeX += snakeSize
@@ -94,11 +96,10 @@ function moveSnake() {
 
 function checkCollision() {
 
-  if (snakeX === 0 && currentDirection === "LEFT") return true;
-  if (snakeX === canvas.width - snakeSize && currentDirection === "RIGHT") return true
-  if (snakeY === 0 && currentDirection === "UP") return true;
-  if (snakeY === canvas.height - snakeSize && currentDirection === "DOWN") return true
-
+  if (snakeX === 0 && currentDirection === "LEFT") gameIsOver()
+  if (snakeX === canvas.width - snakeSize && currentDirection === "RIGHT") gameIsOver()
+  if (snakeY === 0 && currentDirection === "UP") gameIsOver()
+  if (snakeY === canvas.height - snakeSize && currentDirection === "DOWN") gameIsOver()
 }
 
 function randomNumber() {
@@ -109,8 +110,7 @@ function eatApple() {
   if (snakeX === appleX && snakeY === appleY) {
     appleX = randomNumber()
     appleY = randomNumber()
-    scoreText.textContent = score++
-    console.log("apple")
+    scoreText.textContent = ++score
     growSnake()
   }
 }
@@ -119,16 +119,65 @@ function eatApple() {
 function growSnake() {
   snakeBody.push({})
 }
- 
+
+
+function checkSnakeCollision() {
+  const hasCollision = snakeBody.slice(1).some(segment =>
+    segment.x === snakeX && segment.y === snakeY
+  );
+  if (hasCollision) {
+    resetGame()
+  }
+}
+
+
+
+function resetGame() {
+  currentDirection = null
+  snakeX = 200;
+  snakeY = 200;
+  appleX = randomNumber();
+  appleY = randomNumber();
+  score = 0
+  snakeBody.length = 0
+  scoreText.textContent = score
+  gameIsRunning = true
+}
+
+resetGame()
+
+
+
 
 function gameloop() {
+  if (!gameIsRunning) return
   ctx.fillStyle = "#003049";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   eatApple()
   moveSnake()
   drawApple()
   drawSnake()
+  checkSnakeCollision()
+  checkCollision()
 }
+
+function gameIsOver() {
+  gameIsRunning = false
+  modal.classList.add("active")
+  overlay.classList.add("active")
+  const finalScore = document.querySelector(".finalScore")
+  finalScore.textContent = `Game Over! Score: ${score}`;
+}
+
+resetBtn.addEventListener("click", () => {
+  resetGame()
+  overlay.classList.remove("active")
+  modal.classList.remove("active")
+})
 
 setInterval(gameloop, speed)
 window.addEventListener("keydown", snakeDirection)
+
+
+
+
