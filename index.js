@@ -126,7 +126,7 @@ function checkSnakeCollision() {
     segment.x === snakeX && segment.y === snakeY
   );
   if (hasCollision) {
-    resetGame()
+    gameIsOver()
   }
 }
 
